@@ -1,9 +1,8 @@
-use crate::llm::chat::{ChatMessage, ChatProvider};
-use crate::llm::chat::providers::GPTChat;
-use crate::llm::tools::{Tool, SearchTool};
+extern crate vulcan;
 
-mod llm;
-mod openai;
+use vulcan::chat::{ChatMessage, ChatProvider};
+use vulcan::chat::providers::GPTChat;
+use vulcan::tools::{Tool, SearchTool};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

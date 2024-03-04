@@ -2,8 +2,8 @@ use std::fmt::Display;
 
 use serde_json::Value;
 
-use crate::llm::chat::{ChatMessage, ChatProvider, ChatRole};
-use crate::llm::tools::Tool;
+use crate::chat::{ChatMessage, ChatProvider, ChatRole};
+use crate::tools::Tool;
 use crate::openai;
 
 pub struct GPTChat {
@@ -48,8 +48,6 @@ impl ChatProvider for GPTChat {
                 for tool in tools.clone() {
                     if tool_call.function.name == tool.name() {
                         let args: Value = serde_json::from_str(&tool_call.function.arguments)?;
-                        println!("Tool call: {}", tool.name());
-                        println!("{}", args);
                         let result = tool.call(args);
                         return Ok(result);
                     }
