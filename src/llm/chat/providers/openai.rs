@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use serde_json::Value;
+
 use crate::llm::chat::{ChatMessage, ChatProvider, ChatRole};
 use crate::llm::tools::Tool;
 use crate::openai;
@@ -11,9 +13,7 @@ pub struct GPTChat {
 }
 
 impl GPTChat {
-    pub fn new(api_key: String) -> GPTChat {
-        let model = "gpt-3.5-turbo".to_string();
-        let temperature = 0.3;
+    pub fn new(model: String, api_key: String, temperature: f32) -> GPTChat {
         GPTChat {
             api_key,
             model,
@@ -26,27 +26,43 @@ impl ChatProvider for GPTChat {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
-        tools: Option<Vec<&dyn Tool>>,
+        tools: Vec<&dyn Tool>,
     ) -> Result<String, Box<dyn std::error::Error>> {
         let messages = messages.iter().map(convert_message).collect();
-        let tools: Option<Vec<openai::ChatToolDefinition>> = match tools {
-            Some(tools) => Some(tools.iter().map(|t| convert_tool(*t)).collect()),
-            None => None,
-        };
+        let tool_definitions: Vec<openai::ChatToolDefinition> = tools.clone().iter().map(|t| convert_tool(*t)).collect();
         let request = openai::ChatRequest {
             api_key: self.api_key.clone(),
             model: self.model.clone(),
             messages,
             temperature: self.temperature,
-            tools,
+            tools: Some(tool_definitions),
             tool_choice: None,
         };
         let response = openai::chat(request).await?;
+
+        let choice = response.choices[0].clone();
+
+        if choice.message.tool_calls.is_some() {
+            let tool_calls = choice.message.tool_calls.unwrap();
+            for tool_call in tool_calls {
+                for tool in tools.clone() {
+                    if tool_call.function.name == tool.name() {
+                        let args: Value = serde_json::from_str(&tool_call.function.arguments)?;
+                        println!("Tool call: {}", tool.name());
+                        println!("{}", args);
+                        let result = tool.call(args);
+                        return Ok(result);
+                    }
+                }
+            }
+        }
+
         let response = 
             match response.choices[0].message.content {
                 Some(ref content) => content.clone(),
                 None => "".to_string(),
             };
+
         Ok(response)
     }
 }
@@ -72,7 +88,7 @@ fn convert_message(message: &ChatMessage) -> openai::ChatMessage {
 
 fn convert_tool(tool: &dyn Tool) -> openai::ChatToolDefinition {
     openai::ChatToolDefinition {
-        tool_type: "tool".to_string(),
+        tool_type: "function".to_string(),
         function: openai::ChatToolFunctionDefinition {
             name: tool.name(),
             description: Some(tool.description()),

@@ -27,7 +27,8 @@ impl Tool for SearchTool {
                     "type": "string",
                     "description": "The query term to search for"
                 }
-            }
+            },
+            "required": ["query"]
         })
     }
 

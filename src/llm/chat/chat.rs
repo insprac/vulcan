@@ -10,7 +10,7 @@ pub trait ChatProvider {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
-        tools: Option<Vec<&dyn Tool>>,
+        tools: Vec<&dyn Tool>,
     ) -> Result<String, Box<dyn std::error::Error>>;
 }
 
