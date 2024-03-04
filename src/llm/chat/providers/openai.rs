@@ -35,7 +35,7 @@ impl ChatProvider for GPTChat {
             model: self.model.clone(),
             messages,
             temperature: self.temperature,
-            tools: Some(tool_definitions),
+            tools: if tool_definitions.is_empty() { None } else { Some(tool_definitions) },
             tool_choice: None,
         };
         let response = openai::chat(request).await?;
