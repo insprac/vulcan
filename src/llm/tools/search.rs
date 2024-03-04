@@ -11,6 +11,14 @@ struct SearchToolArgs {
 pub struct SearchTool {}
 
 impl Tool for SearchTool {
+    fn name(&self) -> String {
+        "search".to_string()
+    }
+
+    fn description(&self) -> String {
+        "Search the web for new or more up-to-date information".to_string()
+    }
+
     fn define(&self) -> Value {
         json!({
             "type": "object",

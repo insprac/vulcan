@@ -11,7 +11,7 @@ impl GeminiChat {
 }
 
 impl ChatProvider for GeminiChat {
-    fn chat(&self, messages: &Vec<ChatMessage>, tools: Option<Vec<&dyn Tool>>) -> &str {
-        "Gemini chat: not implemented yet."
+    async fn chat(&self, messages: &Vec<ChatMessage>, tools: Option<Vec<&dyn Tool>>) -> Result<String, Box<dyn std::error::Error>> {
+        Ok("Gemini chat: not implemented yet.".to_string())
     }
 }

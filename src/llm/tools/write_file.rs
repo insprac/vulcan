@@ -12,6 +12,14 @@ struct WriteFileToolArgs {
 pub struct WriteFileTool {}
 
 impl Tool for WriteFileTool {
+    fn name(&self) -> String {
+        "write_file".to_string()
+    }
+
+    fn description(&self) -> String {
+        "Write content to a file on the local file system".to_string()
+    }
+
     fn define(&self) -> Value {
         json!({
             "type": "object",

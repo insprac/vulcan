@@ -7,7 +7,11 @@ pub enum ChatRole {
 }
 
 pub trait ChatProvider {
-    fn chat(&self, messages: &Vec<ChatMessage>, tools: Option<Vec<&dyn Tool>>) -> &str;
+    async fn chat(
+        &self,
+        messages: &Vec<ChatMessage>,
+        tools: Option<Vec<&dyn Tool>>,
+    ) -> Result<String, Box<dyn std::error::Error>>;
 }
 
 pub struct ChatMessage {

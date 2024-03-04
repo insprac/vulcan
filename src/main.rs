@@ -1,11 +1,12 @@
 use crate::llm::chat::{ChatMessage, ChatProvider};
-use crate::llm::tools::{SearchTool, Tool, WriteFileTool};
 use crate::llm::chat::providers::GPTChat;
 
 mod env;
 mod llm;
+mod openai;
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let openai = GPTChat::new(env::openai_api_key());
     let messages = vec![
         ChatMessage::system(
@@ -13,7 +14,7 @@ fn main() {
         ),
         ChatMessage::user("How far is Jupiter from the sun?".to_string()),
     ];
-    let result = openai.chat(&messages, None);
+    let result = openai.chat(&messages, None).await?;
     println!("{}", result);
-    let functions: Vec<&dyn Tool> = vec![&SearchTool {}, &WriteFileTool {}];
+    Ok(())
 }
