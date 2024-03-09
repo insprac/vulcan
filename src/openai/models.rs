@@ -73,3 +73,30 @@ pub struct ChatToolFunctionCall {
     pub name: String,
     pub arguments: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EmbedRequest {
+    #[serde(skip)]
+    pub api_key: String,
+    pub model: String,
+    pub inputs: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EmbedResponse {
+    pub data: Vec<Embedding>,
+    pub model: String,
+    pub usage: EmbedUsage,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Embedding {
+    pub embedding: Vec<f32>,
+    pub index: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct EmbedUsage {
+    pub prompt_tokens: u32,
+    pub total_tokens: u32,
+}
