@@ -1,5 +1,6 @@
 use crate::llm::tools::Tool;
 
+#[derive(Clone, Debug)]
 pub enum ChatRole {
     User,
     Assistant,
@@ -14,6 +15,7 @@ pub trait ChatProvider {
     ) -> Result<String, Box<dyn std::error::Error>>;
 }
 
+#[derive(Clone, Debug)]
 pub struct ChatMessage {
     pub role: ChatRole,
     pub content: String,
