@@ -1,4 +1,5 @@
-use crate::llm::{chat::{ChatMessage, ChatProvider}, tools::Tool};
+use crate::llm::chat::{ChatMessage, ChatProvider};
+use crate::llm::tools::Tool;
 
 pub struct GeminiChat {
     api_key: String,
@@ -11,7 +12,12 @@ impl GeminiChat {
 }
 
 impl ChatProvider for GeminiChat {
-    async fn chat(&self, messages: &Vec<ChatMessage>, tools: Vec<&dyn Tool>) -> Result<String, Box<dyn std::error::Error>> {
-        Ok("Gemini chat: not implemented yet.".to_string())
+    async fn chat(
+        &self,
+        _messages: &Vec<ChatMessage>,
+        _tools: Vec<Tool>,
+    ) -> Result<ChatMessage, Box<dyn std::error::Error>> {
+        let message = ChatMessage::assistant("Gemini chat: not implemented yet.".to_string());
+        Ok(message)
     }
 }

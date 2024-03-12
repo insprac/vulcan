@@ -1,4 +1,4 @@
-use crate::llm::tools::Tool;
+use crate::{llm::tools::Tool, tools::ToolCall};
 
 #[derive(Clone, Debug)]
 pub enum ChatRole {
@@ -11,14 +11,15 @@ pub trait ChatProvider {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
-        tools: Vec<&dyn Tool>,
-    ) -> Result<String, Box<dyn std::error::Error>>;
+        tools: Vec<Tool>,
+    ) -> Result<ChatMessage, Box<dyn std::error::Error>>;
 }
 
 #[derive(Clone, Debug)]
 pub struct ChatMessage {
     pub role: ChatRole,
     pub content: String,
+    pub tool_calls: Option<Vec<ToolCall>>,
 }
 
 impl ChatMessage {
@@ -26,6 +27,7 @@ impl ChatMessage {
         ChatMessage {
             role: ChatRole::User,
             content,
+            tool_calls: None,
         }
     }
 
@@ -33,6 +35,7 @@ impl ChatMessage {
         ChatMessage {
             role: ChatRole::Assistant,
             content,
+            tool_calls: None,
         }
     }
 
@@ -40,6 +43,7 @@ impl ChatMessage {
         ChatMessage {
             role: ChatRole::System,
             content,
+            tool_calls: None,
         }
     }
 }

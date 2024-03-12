@@ -1,10 +1,8 @@
 use std::fmt::Display;
 
-use serde_json::Value;
-
 use crate::chat::{ChatMessage, ChatProvider, ChatRole};
-use crate::tools::Tool;
 use crate::openai;
+use crate::tools::{Tool, ToolCall};
 
 pub struct GPTChat {
     pub model: String,
@@ -26,42 +24,36 @@ impl ChatProvider for GPTChat {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
-        tools: Vec<&dyn Tool>,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+        tools: Vec<Tool>,
+    ) -> Result<ChatMessage, Box<dyn std::error::Error>> {
         let messages = messages.iter().map(convert_message).collect();
-        let tool_definitions: Vec<openai::ChatToolDefinition> = tools.clone().iter().map(|t| convert_tool(*t)).collect();
-        let request = openai::ChatRequest {
-            api_key: self.api_key.clone(),
-            model: self.model.clone(),
+        let tool_definitions: Vec<openai::ChatToolDefinition> =
+            tools.clone().iter().map(|t| convert_tool(t.clone())).collect();
+
+        let response = chat_request(
+            self.api_key.clone(),
+            self.model.clone(),
             messages,
-            temperature: self.temperature,
-            tools: if tool_definitions.is_empty() { None } else { Some(tool_definitions) },
-            tool_choice: None,
+            self.temperature,
+            tool_definitions,
+        ).await?;
+
+        let content = match response.choices[0].message.content {
+            Some(ref content) => content.clone(),
+            None => "".to_string(),
         };
-        let response = openai::chat(request).await?;
+        let tool_calls = match response.choices[0].message.tool_calls {
+            Some(ref calls) => Some(calls.iter().map(convert_tool_call).collect()),
+            None => None,
+        };
 
-        let choice = response.choices[0].clone();
+        let response_message = ChatMessage {
+            role: ChatRole::Assistant,
+            content,
+            tool_calls,
+        };
 
-        if choice.message.tool_calls.is_some() {
-            let tool_calls = choice.message.tool_calls.unwrap();
-            for tool_call in tool_calls {
-                for tool in tools.clone() {
-                    if tool_call.function.name == tool.name() {
-                        let args: Value = serde_json::from_str(&tool_call.function.arguments)?;
-                        let result = tool.call(args);
-                        return Ok(result);
-                    }
-                }
-            }
-        }
-
-        let response = 
-            match response.choices[0].message.content {
-                Some(ref content) => content.clone(),
-                None => "".to_string(),
-            };
-
-        Ok(response)
+        Ok(response_message)
     }
 }
 
@@ -75,6 +67,25 @@ impl Display for ChatRole {
     }
 }
 
+async fn chat_request(
+    api_key: String,
+    model: String,
+    messages: Vec<openai::ChatMessage>,
+    temperature: f32,
+    tools: Vec<openai::ChatToolDefinition>,
+) -> Result<openai::ChatResponse, Box<dyn std::error::Error>> {
+    let request = openai::ChatRequest {
+        api_key,
+        model,
+        messages,
+        temperature,
+        tools: if tools.is_empty() { None } else { Some(tools) },
+        tool_choice: None,
+    };
+
+    openai::chat(request).await
+}
+
 fn convert_message(message: &ChatMessage) -> openai::ChatMessage {
     openai::ChatMessage {
         role: message.role.to_string(),
@@ -84,13 +95,20 @@ fn convert_message(message: &ChatMessage) -> openai::ChatMessage {
     }
 }
 
-fn convert_tool(tool: &dyn Tool) -> openai::ChatToolDefinition {
+fn convert_tool(tool: Tool) -> openai::ChatToolDefinition {
     openai::ChatToolDefinition {
         tool_type: "function".to_string(),
         function: openai::ChatToolFunctionDefinition {
-            name: tool.name(),
-            description: Some(tool.description()),
-            parameters: serde_json::Value::Null,
+            name: tool.name,
+            description: Some(tool.description),
+            parameters: tool.definition,
         },
+    }
+}
+
+fn convert_tool_call(call: &openai::ChatToolCall) -> ToolCall {
+    ToolCall {
+        name: call.function.name.clone(),
+        arguments: serde_json::to_value(call.function.arguments.clone()).unwrap(),
     }
 }

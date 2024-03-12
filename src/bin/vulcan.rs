@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let prompt = args[3].clone();
     let messages = vec![ChatMessage::user(prompt)];
     let result = chat_provider.chat(&messages, vec![]).await?;
-    println!("{}", result);
+    println!("{:?}", result);
     Ok(())
 }
 

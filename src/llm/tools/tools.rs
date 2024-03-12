@@ -1,9 +1,14 @@
 use serde_json::Value;
 
-pub trait Tool {
-    fn name(&self) -> String;
-    fn description(&self) -> String;
-    fn define(&self) -> Value;
-    fn call(&self, args: Value) -> String;
+#[derive(Debug, Clone)]
+pub struct Tool {
+    pub name: String,
+    pub description: String,
+    pub definition: Value,
 }
 
+#[derive(Debug, Clone)]
+pub struct ToolCall {
+    pub name: String,
+    pub arguments: Value,
+}
