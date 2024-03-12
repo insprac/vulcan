@@ -27,7 +27,7 @@ impl ChatProvider for GPTChat {
         tools: Vec<Tool>,
     ) -> Result<ChatMessage, Box<dyn std::error::Error>> {
         let messages = messages.iter().map(convert_message).collect();
-        let tool_definitions: Vec<openai::ChatToolDefinition> =
+        let tools: Vec<openai::ChatToolDefinition> =
             tools.clone().iter().map(|t| convert_tool(t.clone())).collect();
 
         let response = chat_request(
@@ -35,7 +35,7 @@ impl ChatProvider for GPTChat {
             self.model.clone(),
             messages,
             self.temperature,
-            tool_definitions,
+            tools,
         ).await?;
 
         let content = match response.choices[0].message.content {
@@ -101,7 +101,7 @@ fn convert_tool(tool: Tool) -> openai::ChatToolDefinition {
         function: openai::ChatToolFunctionDefinition {
             name: tool.name,
             description: Some(tool.description),
-            parameters: tool.definition,
+            parameters: tool.params,
         },
     }
 }
@@ -109,6 +109,6 @@ fn convert_tool(tool: Tool) -> openai::ChatToolDefinition {
 fn convert_tool_call(call: &openai::ChatToolCall) -> ToolCall {
     ToolCall {
         name: call.function.name.clone(),
-        arguments: serde_json::to_value(call.function.arguments.clone()).unwrap(),
+        args: serde_json::to_value(call.function.arguments.clone()).unwrap(),
     }
 }

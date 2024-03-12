@@ -4,11 +4,11 @@ use serde_json::Value;
 pub struct Tool {
     pub name: String,
     pub description: String,
-    pub definition: Value,
+    pub params: Value,
 }
 
 #[derive(Debug, Clone)]
 pub struct ToolCall {
     pub name: String,
-    pub arguments: Value,
+    pub args: Value,
 }
