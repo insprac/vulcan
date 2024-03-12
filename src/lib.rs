@@ -1,5 +1,6 @@
-mod llm;
+pub mod chat;
+pub mod completion;
+pub mod tools;
 
+// Integrations
 pub mod openai;
-
-pub use llm::*;

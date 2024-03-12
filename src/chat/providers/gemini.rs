@@ -1,5 +1,5 @@
-use crate::llm::chat::{ChatMessage, ChatProvider};
-use crate::llm::tools::Tool;
+use crate::chat::{ChatMessage, ChatProvider};
+use crate::tools::Tool;
 
 pub struct GeminiChat {
     api_key: String,

@@ -1,4 +1,4 @@
-use crate::{llm::tools::Tool, tools::ToolCall};
+use crate::tools::{Tool, ToolCall};
 
 #[derive(Clone, Debug)]
 pub enum ChatRole {
