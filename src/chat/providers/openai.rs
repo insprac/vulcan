@@ -109,6 +109,6 @@ fn convert_tool(tool: Tool) -> openai::ChatToolDefinition {
 fn convert_tool_call(call: &openai::ChatToolCall) -> ToolCall {
     ToolCall {
         name: call.function.name.clone(),
-        args: serde_json::to_value(call.function.arguments.clone()).unwrap(),
+        args: serde_json::from_str(&call.function.arguments).unwrap(),
     }
 }
