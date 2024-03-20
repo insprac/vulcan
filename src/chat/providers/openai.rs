@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::chat::{ChatMessage, ChatProvider, ChatRole};
 use crate::openai;
 use crate::tools::{Tool, ToolCall};
@@ -54,16 +52,6 @@ impl ChatProvider for GPTChat {
         };
 
         Ok(response_message)
-    }
-}
-
-impl Display for ChatRole {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ChatRole::System => write!(f, "system"),
-            ChatRole::User => write!(f, "user"),
-            ChatRole::Assistant => write!(f, "assistant"),
-        }
     }
 }
 

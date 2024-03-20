@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::tools::{Tool, ToolCall};
 
 #[derive(Clone, Debug)]
@@ -45,5 +47,21 @@ impl ChatMessage {
             content,
             tool_calls: None,
         }
+    }
+}
+
+impl Display for ChatRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ChatRole::User => write!(f, "user"),
+            ChatRole::Assistant => write!(f, "assistant"),
+            ChatRole::System => write!(f, "system"),
+        }
+    }
+}
+
+impl Display for ChatMessage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}]\n{}", self.role, self.content)
     }
 }
