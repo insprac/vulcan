@@ -45,7 +45,7 @@ impl ChatMessage {
         };
         crate::chat::ChatMessage {
             role: crate::chat::ChatRole::from_string(&self.role),
-            content: self.content.clone().unwrap(),
+            content: self.content.clone().unwrap_or("".to_string()),
             tool_calls,
             tool_call_id: self.tool_call_id.clone(),
         }
@@ -204,6 +204,22 @@ mod tests {
         assert!(vulcan_message.tool_call_id.is_none());
     }
 
+    #[test]
+    fn test_to_vulcan_message_no_content() {
+        let chat_message = ChatMessage {
+            role: "assistant".to_string(),
+            content: None,
+            tool_calls: None,
+            tool_call_id: None,
+        };
+
+        let vulcan_message = chat_message.to_vulcan_message();
+
+        assert_eq!(vulcan_message.role.to_string(), "assistant");
+        assert_eq!(vulcan_message.content, "");
+        assert!(vulcan_message.tool_calls.is_none());
+        assert!(vulcan_message.tool_call_id.is_none());
+    }
     #[test]
     fn test_from_vulcan_call() {
         let vulcan_call = VulcanToolCall {
