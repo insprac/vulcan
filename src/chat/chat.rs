@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use serde::{Deserialize, Serialize};
+
 use crate::tools::{ToolDefinition, ToolCall};
 
 pub trait ChatProvider {
@@ -10,7 +12,7 @@ pub trait ChatProvider {
     ) -> Result<ChatMessage, Box<dyn std::error::Error>>;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum ChatRole {
     User,
     Assistant,
@@ -41,7 +43,7 @@ impl ChatRole {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ChatMessage {
     pub role: ChatRole,
     pub content: String,
