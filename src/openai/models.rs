@@ -46,7 +46,7 @@ impl ChatMessage {
             None => None,
         };
         crate::chat::ChatMessage {
-            role: ChatRole::from_string(&self.role).unwrap_or(ChatRole::User),
+            role: ChatRole::from_str(&self.role).unwrap_or(ChatRole::User),
             content: self.content.clone().unwrap_or("".to_string()),
             tool_calls,
             tool_call_id: self.tool_call_id.clone(),

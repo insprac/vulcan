@@ -32,7 +32,7 @@ impl Display for ChatRole {
 }
 
 impl ChatRole {
-    pub fn from_string(role: &str) -> Result<ChatRole, Box<dyn std::error::Error>> {
+    pub fn from_str(role: &str) -> Result<ChatRole, Box<dyn std::error::Error>> {
         match role {
             "user" => Ok(ChatRole::User),
             "assistant" => Ok(ChatRole::Assistant),
