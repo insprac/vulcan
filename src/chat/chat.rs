@@ -32,13 +32,13 @@ impl Display for ChatRole {
 }
 
 impl ChatRole {
-    pub fn from_string(role: &str) -> ChatRole {
+    pub fn from_string(role: &str) -> Result<ChatRole, Box<dyn std::error::Error>> {
         match role {
-            "user" => ChatRole::User,
-            "assistant" => ChatRole::Assistant,
-            "system" => ChatRole::System,
-            "tool" => ChatRole::Tool,
-            _ => ChatRole::User,
+            "user" => Ok(ChatRole::User),
+            "assistant" => Ok(ChatRole::Assistant),
+            "system" => Ok(ChatRole::System),
+            "tool" => Ok(ChatRole::Tool),
+            _ => Err(format!("Unknown role: {}", role).into()),
         }
     }
 }

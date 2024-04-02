@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::chat::ChatRole;
+
 #[derive(Debug, Serialize)]
 pub struct ChatRequest {
     #[serde(skip)]
@@ -44,7 +46,7 @@ impl ChatMessage {
             None => None,
         };
         crate::chat::ChatMessage {
-            role: crate::chat::ChatRole::from_string(&self.role),
+            role: ChatRole::from_string(&self.role).unwrap_or(ChatRole::User),
             content: self.content.clone().unwrap_or("".to_string()),
             tool_calls,
             tool_call_id: self.tool_call_id.clone(),
