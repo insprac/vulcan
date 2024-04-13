@@ -1,4 +1,4 @@
-# Vulcan Chat Assistant
+# Vulcan
 
 Vulcan is an LLM chat assistant rust library supporting different providers and tools.
 
