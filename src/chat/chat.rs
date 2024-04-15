@@ -4,12 +4,13 @@ use serde::{Deserialize, Serialize};
 
 use crate::tools::{ToolDefinition, ToolCall};
 
+#[async_trait::async_trait]
 pub trait ChatProvider {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
         tools: Vec<ToolDefinition>,
-    ) -> Result<ChatMessage, Box<dyn std::error::Error>>;
+    ) -> crate::error::Result<ChatMessage>;
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -32,7 +33,7 @@ impl Display for ChatRole {
 }
 
 impl ChatRole {
-    pub fn from_str(role: &str) -> Result<ChatRole, Box<dyn std::error::Error>> {
+    pub fn from_str(role: &str) -> crate::error::Result<ChatRole> {
         match role {
             "user" => Ok(ChatRole::User),
             "assistant" => Ok(ChatRole::Assistant),

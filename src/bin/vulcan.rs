@@ -6,7 +6,7 @@ use vulcan::chat::{ChatMessage, ChatProvider};
 use vulcan::chat::providers::GPTChat;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> vulcan::error::Result<()> {
     let args = args().collect::<Vec<String>>();
     if args.len() != 4 {
         panic!("Usage: chat <provider> <model> <prompt>");

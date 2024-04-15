@@ -1,6 +1,6 @@
-use crate::chat::{ChatMessage, ChatProvider, ChatRole};
+use crate::chat::{ChatMessage, ChatProvider};
 use crate::openai;
-use crate::tools::{ToolCall, ToolDefinition};
+use crate::tools::ToolDefinition;
 
 pub struct GPTChat {
     pub model: String,
@@ -18,12 +18,13 @@ impl GPTChat {
     }
 }
 
+#[async_trait::async_trait]
 impl ChatProvider for GPTChat {
     async fn chat(
         &self,
         messages: &Vec<ChatMessage>,
         tools: Vec<ToolDefinition>,
-    ) -> Result<ChatMessage, Box<dyn std::error::Error>> {
+    ) -> crate::error::Result<ChatMessage> {
         let messages = messages
             .iter()
             .map(openai::ChatMessage::from_vulcan_message)
@@ -54,7 +55,7 @@ async fn chat_request(
     messages: Vec<openai::ChatMessage>,
     temperature: f32,
     tools: Vec<openai::ChatToolDefinition>,
-) -> Result<openai::ChatResponse, Box<dyn std::error::Error>> {
+) -> crate::error::Result<openai::ChatResponse> {
     let request = openai::ChatRequest {
         api_key,
         model,
@@ -64,5 +65,7 @@ async fn chat_request(
         tool_choice: None,
     };
 
-    openai::chat(request).await
+    openai::chat(request)
+        .await
+        .map_err(|e| crate::error::Error::Provider(e.to_string()))
 }

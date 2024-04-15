@@ -14,3 +14,10 @@ pub struct ToolCall {
     pub name: String,
     pub args: Value,
 }
+
+#[async_trait::async_trait]
+pub trait Tool {
+    fn describe(&self) -> ToolDefinition;
+    async fn run(&self, params: Value) -> Result<String, String>;
+}
+

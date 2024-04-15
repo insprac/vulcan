@@ -1,3 +1,4 @@
+pub mod error;
 pub mod chat;
 pub mod completion;
 pub mod tools;
